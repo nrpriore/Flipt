@@ -18,6 +18,11 @@ public class Level {
 	public string TileMap {
 		get{return _tileMap;}
 	}
+	// Score tier based on specified # of turns taken. [0] gold, [1] silver, [2] bronze
+	private int[] _tierReq;
+	public int[] TierReq {
+		get{return _tierReq;}
+	}
 
 	/// Public methods -------------------------------------------------------------
 	// Gets vector2 position for tile with given ID based on level.Width
@@ -35,6 +40,7 @@ public class Level {
 		Level test = new Level();
 		test._width = 4;
 		test._tileMap = "4,8,9,10,12,14,-16,17,18,19,20";
+		test._tierReq = new int[] {3, 5, 7};
 
 		return test;
 	}

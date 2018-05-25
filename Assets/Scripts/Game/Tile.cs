@@ -42,7 +42,12 @@ public class Tile : MonoBehaviour {
 
 	// Runs when mouse click on tile
 	public void OnMouseDown() {
-		GameObject.Find("GameController").GetComponent<GameController>().FlipPairedTiles(_id);
+		if(Level.CurrentLevel != null) {  // If in game
+			GameObject.Find("GameController").GetComponent<GameController>().FlipPairedTiles(_id);
+		}
+		else {  // If in start menu
+
+		}
 	}
 
 	// Flips this tile

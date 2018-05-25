@@ -11,8 +11,9 @@ public class GameController : MonoBehaviour {
 
 	// Runs when Game scene is loaded
 	void Start () {
-		Level level = (Level.CurrentLevel != null)? Level.CurrentLevel : Level.TestLevel();
-		BuildLevel(level);
+		//Level level = (Level.CurrentLevel != null)? Level.CurrentLevel : Level.TestLevel();
+		Level.CurrentLevel = Level.TestLevel();
+		BuildLevel(Level.CurrentLevel);
 	}
 
 	/// Public methods -------------------------------------------------------------
@@ -29,13 +30,7 @@ public class GameController : MonoBehaviour {
 	// Build input Level
 	private void BuildLevel(Level level) {
 		// Adjust camera based on level.Width
-		float aspect = (float)Screen.width / Screen.height;
-		float tempOrtho = level.Width / (2f * aspect);
-		float camY = tempOrtho - 0.5f;
-		camY -= ((tempOrtho * 2f) - Mathf.Floor(tempOrtho * 2f)) / 2f;
-		float camX = (tempOrtho * aspect) - 0.5f;
-		Camera.main.orthographicSize = tempOrtho * 1.1f;
-		Camera.main.transform.localPosition = new Vector3(camX, camY, -10f);
+		CameraUtil.SizeToWidth(level.Width);
 
 		// Create tiles
 		_tiles = new List<Tile>();
