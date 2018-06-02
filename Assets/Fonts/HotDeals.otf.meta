@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 79e3c3253f1244db9b8a090f0fc64407
+timeCreated: 1510506413
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Hot Deals
+  fontNames:
+  - Hot Deals
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

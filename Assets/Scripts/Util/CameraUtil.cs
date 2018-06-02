@@ -1,9 +1,9 @@
 ﻿using UnityEngine;					// Access to Camera class
 
-// Contains utility methods for Unity Cameras
+// Contains utility methods for Unity Cameras 
 public static class CameraUtil {
 
-	// Sets ortho camera size & position for input width (assumes tile = 1 unit with center pivot)
+	// Sets ortho camera size and position for input width (assumes tile = 1 unit with center pivot 
 	public static void SizeToWidth(int width) {
 		float aspect = (float)Screen.width / Screen.height;
 		float tempOrtho = width / (2f * aspect);

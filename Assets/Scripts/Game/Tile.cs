@@ -15,7 +15,7 @@ public class Tile : MonoBehaviour {
 
 	// Returns Color to paint 'off' tiles
 	public static Color ColorOFF {
-		get {return ColorUtil.HexToColor("676C95");}
+		get {return ColorUtil.HexToColor("1F325B");}
 	}
 
 
@@ -42,12 +42,9 @@ public class Tile : MonoBehaviour {
 
 	// Runs when mouse click on tile
 	public void OnMouseDown() {
-		if(Level.CurrentLevel != null) {  // If in game
-			GameObject.Find("GameController").GetComponent<GameController>().FlipPairedTiles(_id);
-		}
-		else {  // If in start menu
-
-		}
+		if(Level.CurrentLevel != null) {
+			Level.CurrentLevel.FlipPairedTiles(_id);
+		}  // Maybe add some error handling if there are somehow tiles without a CurrentLevel set
 	}
 
 	// Flips this tile
