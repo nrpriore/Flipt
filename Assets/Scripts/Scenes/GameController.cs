@@ -5,10 +5,15 @@ public class GameController : MonoBehaviour {
 
 	// Runs when Game scene is loaded
 	void Start () {
+		// Dev
 		if(Level.CurrentLevel == null) {
 			Level.CurrentLevel = Level.TestLevel();
+			Level.CurrentLevel.Play();
+			return;
 		}
-		Level.CurrentLevel.Build();
+		// End dev
+
+		Level.CurrentLevel.Play();
 	}	
 
 }

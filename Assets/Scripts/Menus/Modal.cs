@@ -1,26 +1,29 @@
 ﻿using UnityEngine;					// To inherit from Monobehaviour
+using UnityEngine.UI;				// For button class
 
 // Parent class for modal windows
 public class Modal : MonoBehaviour {
 
-	// Set this to the gameobject instance in the Start() method of child classes
-	public RectTransform Menu {
-		get; set;
-	}
-	// Target scale and background to block input touches
-	private Vector2 _target;
-	private GameObject _background;
+	protected bool BackgroundInteractable;  // Sets if clicking the background closes the window
+	
+	private Vector2 _target;  // Target scale of _menu
+	private RectTransform _menu;  // Menu UI to change scale of
+	private GameObject _background;  // Background for faded look
 
 
 	// Runs when a scene with a modal child is loaded
 	public virtual void Start () {
 		_target = Vector2.zero;
+		_menu = gameObject.GetComponent<RectTransform>();
 		_background = gameObject.transform.parent.Find("Background").gameObject;
+		if(BackgroundInteractable) {
+			_background.GetComponent<Button>().onClick.AddListener(Close);
+		}
 	}
 	
 	// Runs every frame
 	void Update () {
-		Menu.localScale = Vector2.Lerp(Menu.localScale, _target, Time.deltaTime * 20f);
+		_menu.localScale = Vector2.Lerp(_menu.localScale, _target, Time.deltaTime * 30f);
 	}
 
 
@@ -33,7 +36,9 @@ public class Modal : MonoBehaviour {
 
 	// Closes modal window
 	public void Close() {
-		_target = Vector2.zero;
-		_background.SetActive(false);
+		if(_target == Vector2.one) {
+			_target = Vector2.zero;
+			_background.SetActive(false);
+		}
 	}
 }

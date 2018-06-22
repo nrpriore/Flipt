@@ -7,12 +7,10 @@ public class Tile : MonoBehaviour {
 	public static GameObject Prefab {
 		get {return Resources.Load<GameObject>("Prefabs/Game/Tile");}
 	}
-
 	// Returns Color to paint 'on' tiles
 	public static Color ColorON {
 		get {return ColorUtil.HexToColor("FFFFFF");}
 	}
-
 	// Returns Color to paint 'off' tiles
 	public static Color ColorOFF {
 		get {return ColorUtil.HexToColor("1F325B");}

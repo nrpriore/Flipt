@@ -4,6 +4,7 @@ using System.Collections.Generic;	// For dictionaries
 // Holds the level information and methods
 public class Level {
 
+	// Static reference to the selected level so gameobjects can easily communicate
 	public static Level CurrentLevel = null;
 
 
@@ -15,6 +16,7 @@ public class Level {
 	}
 	// Tile pattern in easily savable string format
 	// (+/-) = tile starts on/off, ID, (comma): "4,-8,-9,-10,12,16"
+	// ID = 1 is bottom left and reads from left to right then up
 	private string _tileMap;
 	public string TileMap {
 		get{return _tileMap;}
@@ -45,6 +47,11 @@ public class Level {
 
 
 	/// Public methods -------------------------------------------------------------
+	// Play this level
+	public void Play() {
+		Build();
+	}
+
 	// Gets vector2 position for tile with given ID based on level.Width
 	// Tiles are 1x1 unit with (0,0) starting bottom left
 	public Vector2 GetTilePosition(int id) {
@@ -62,8 +69,10 @@ public class Level {
 		}
 	}
 
+
+	/// Private methods ------------------------------------------------------------
 	// Build input Level
-	public void Build() {
+	private void Build() {
 		// Adjust camera based on level.Width
 		CameraUtil.SizeToWidth(_width);
 
@@ -122,29 +131,18 @@ public class Level {
 	}
 
 
-	/// Test -----------------------------------------------------------------------
-	// Instantiates a test level configuration
+	/// Static levels --------------------------------------------------------------
 	public static Level TestLevel() {
-		Level test = new Level();
-		test._width = 4;
-		test._tileMap = "5,9,10,-11,13,15,-17,18,19,20,21";
-		test._tierReq = new int[] {3, 5, 7};
-
-		return test;
+		Level level = new Level();
+		level._width = 4;
+		level._tileMap = "5,9,10,-11,13,15,-17,18,19,20,21";
+		return level;
 	}
-	public static Level TestLevel2() { 
-		Level test = new Level();
-		test._width = 3;
-		test._tileMap = "4,5,6,7,8,9,10,11,12";
-
-		return test;
-	}
-
 	public static Level MenuLevel() {
 		Level level = new Level();
 		level._width = 6;
 		level._tileMap = "-1,-2,-3,-4,-5,-6,-7,-9,-10,-12,-13,-15,-16,-17,-18,-19,-20,-21,-23,-26,-29,-32,-33,-34,-35";
-		
 		return level;
 	}
+
 }
