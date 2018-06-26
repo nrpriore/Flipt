@@ -6,9 +6,13 @@ public class StartController : MonoBehaviour {
 
 	// Runs FIRST when Start scene is loaded (app startup)
 	void Awake () {
-		if(CryptoUtil.ValidKeys()) { // Make sure we can decrypt the game data
-
-		} 
+		// DEV
+		//CryptoUtil.ResetKeys();
+		// END DEV
+		if(!CryptoUtil.ValidKeys()) { // Make sure we can decrypt the game data
+			CryptoUtil.ResetKeys();
+		}
+		StaticLevelData.LoadLevelData();
 		
 		Level.CurrentLevel = Level.MenuLevel(); // Create easter egg menu level
 		Level.CurrentLevel.Play();

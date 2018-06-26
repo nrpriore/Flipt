@@ -1,5 +1,6 @@
 ﻿using UnityEngine;					// For access to Vector2
 using System.Collections.Generic;	// For dictionaries
+using Newtonsoft.Json.Linq;			// For access to JObject
 
 // Holds the level information and methods
 public class Level {
@@ -22,10 +23,10 @@ public class Level {
 		get{return _tileMap;}
 	}
 	// Score tier based on specified # of turns taken. [0] gold, [1] silver, [2] bronze
-	private int[] _tierReq;
+	/*private int[] _tierReq;
 	public int[] TierReq {
 		get{return _tierReq;}
-	}
+	}*/
 
 
 	/// In-Game Level information --------------------------------------------------
@@ -50,6 +51,12 @@ public class Level {
 	// Play this level
 	public void Play() {
 		Build();
+	}
+	
+	// Maps JObject data to Level
+	public void LoadFrom(JObject jo) {
+		_width = jo["width"].Value<int>();
+		_tileMap = jo["tile_map"].Value<string>();
 	}
 
 	// Gets vector2 position for tile with given ID based on level.Width
