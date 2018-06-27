@@ -42,4 +42,10 @@ public class Modal : MonoBehaviour {
 			_background.SetActive(false);
 		}
 	}
+
+	// Sets any UI data based on input, overriden by child class
+	public virtual void SetData<T>(T value) {
+		// We only get here if you pass in the wrong type to the child override
+		Debug.Log("Conversion failed in child class");
+	}
 }

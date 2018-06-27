@@ -50,12 +50,19 @@ public class Level {
 	public Dictionary<int, List<int>> PairedTiles {
 		get{return _pairedTiles;}
 	}
+	// Returns whether the level is in progress with changes (i.e. a player has flipped a tile already)
+	// Used mainly for determining confirm screen for next/prev/menu
+	private bool _modified;
+	public bool Modified {
+		get{return _modified;}
+	}
 
 
 	/// Public methods -------------------------------------------------------------
 	// Play this level
 	public void Play() {
 		Build();
+		_modified = false;
 	}
 	
 	// Maps JObject data to Level
@@ -80,6 +87,7 @@ public class Level {
 		foreach(int pairedID in pairedIDs) {
 			_tileByID[pairedID].FlipTile();
 		}
+		_modified = true;
 
 		CheckWinCondition();
 	}
@@ -88,7 +96,7 @@ public class Level {
 	/// Private methods ------------------------------------------------------------
 	// Checks when condition after flipping tiles
 	private void CheckWinCondition() {
-		
+
 	}
 
 	// Build input Level

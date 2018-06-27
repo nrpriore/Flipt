@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;	// To change scenes
 // Main class for LevelSelect scene
 public class LevelSelectController : MonoBehaviour {
 
-	public static LevelPack CurrentLevelPack = null;
+	public static LevelPack CurrentLevelPack;
 
 	private const float LP_SPACING = 20f;
 
@@ -15,6 +15,8 @@ public class LevelSelectController : MonoBehaviour {
 	void Start () {
 		_scrollContainer = GameObject.Find("LevelPacks").GetComponent<RectTransform>();
 
+		CurrentLevelPack = null;
+		Level.CurrentLevel = null;
 		BuildLevelPacks();
 	}
 
