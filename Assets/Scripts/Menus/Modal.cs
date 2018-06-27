@@ -9,6 +9,7 @@ public class Modal : MonoBehaviour {
 	private Vector2 _target;  // Target scale of _menu
 	private RectTransform _menu;  // Menu UI to change scale of
 	private GameObject _background;  // Background for faded look
+	private Color _backgroundColor;  // Color of background
 
 
 	// Runs when a scene with a modal child is loaded
@@ -29,13 +30,13 @@ public class Modal : MonoBehaviour {
 
 	/// Public methods -------------------------------------------------------------
 	// Opens modal window
-	public void Open() {
+	public virtual void Open() {
 		_target = Vector2.one;
 		_background.SetActive(true);
 	}
 
 	// Closes modal window
-	public void Close() {
+	public virtual void Close() {
 		if(_target == Vector2.one) {
 			_target = Vector2.zero;
 			_background.SetActive(false);

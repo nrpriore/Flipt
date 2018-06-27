@@ -7,7 +7,7 @@ public class StartController : MonoBehaviour {
 	// Runs FIRST when Start scene is loaded (app startup)
 	void Awake () {
 		// DEV
-		//CryptoUtil.ResetKeys();
+		CryptoUtil.ResetKeys();
 		// END DEV
 		if(!CryptoUtil.ValidKeys()) { // Make sure we can decrypt the game data
 			CryptoUtil.ResetKeys();

@@ -10,6 +10,11 @@ public class Level {
 
 
 	/// Database Level information -------------------------------------------------
+	// ID of level in levelpack
+	private int _id;
+	public int ID {
+		get{return _id;}
+	}
 	// Width of level in Unity units (Generally 5-10)
 	private int _width;
 	public int Width {
@@ -55,6 +60,7 @@ public class Level {
 	
 	// Maps JObject data to Level
 	public void LoadFrom(JObject jo) {
+		_id = jo["id"].Value<int>();
 		_width = jo["width"].Value<int>();
 		_tileMap = jo["tile_map"].Value<string>();
 	}
@@ -74,10 +80,17 @@ public class Level {
 		foreach(int pairedID in pairedIDs) {
 			_tileByID[pairedID].FlipTile();
 		}
+
+		CheckWinCondition();
 	}
 
 
 	/// Private methods ------------------------------------------------------------
+	// Checks when condition after flipping tiles
+	private void CheckWinCondition() {
+		
+	}
+
 	// Build input Level
 	private void Build() {
 		// Adjust camera based on level.Width

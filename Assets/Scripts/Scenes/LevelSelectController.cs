@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;	// To change scenes
 // Main class for LevelSelect scene
 public class LevelSelectController : MonoBehaviour {
 
+	public static LevelPack CurrentLevelPack = null;
+
 	private const float LP_SPACING = 20f;
 
 	private RectTransform _scrollContainer;

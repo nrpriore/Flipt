@@ -1,4 +1,5 @@
 ﻿using UnityEngine;					// To inherit from Monobehaviour
+using UnityEngine.SceneManagement;	// To change scenes
 using UnityEngine.UI;				// To set UI properties on button
 using Newtonsoft.Json.Linq;			// For access to JObject
 
@@ -17,12 +18,17 @@ public class LevelPack : MonoBehaviour {
 	private Text _name;
 	private GameObject _locked;
 	private Image[] _progress;
+	private Modal _confirmMenu;
+	private Modal _shopMenu;
 
 	// Runs immedietely on instantiation before the next line of code from the instantiating script
 	void Awake() {
 		_name = transform.Find("Name").GetComponent<Text>();
 		_locked = transform.Find("Locked").gameObject;
 		_progress = transform.Find("Progress").GetComponentsInChildren<Image>();
+		_confirmMenu = transform.Find("Menus").Find("ConfirmPlayMenu").GetComponent<ConfirmPlayMenu>();
+		
+		_shopMenu = GameObject.Find("ShopMenu").GetComponent<ShopMenu>();
 	}
 
 	/// Public methods -------------------------------------------------------------
@@ -31,9 +37,42 @@ public class LevelPack : MonoBehaviour {
 		_data = data;
 		_name.text = data.Name;
 		_locked.SetActive(!data.Unlocked);
+		if(!data.Unlocked) {
+			gameObject.GetComponent<Button>().interactable = false;
+		}
 		for(int i = 0; i < data.Progress; i++) {
 			_progress[i].color = ColorUtil.HexToColor(PROGRESS_HEX);
 		}
+	}
+
+	// Runs when levelpack button clicked
+	public void SelectLevelPack() {
+		if(_data.Unlocked) {
+			if(LevelSelectController.CurrentLevelPack != null) {
+				LevelSelectController.CurrentLevelPack.UnselectLevelPack();
+			}
+			LevelSelectController.CurrentLevelPack = this;
+			_confirmMenu.Open();
+		}
+		else {
+
+		}
+	}
+	// Runs when cancel is hit or another levelpack button
+	public void UnselectLevelPack() {
+		_confirmMenu.Close();
+		LevelSelectController.CurrentLevelPack = null;
+	}
+
+	// Runs when play is selected from ConfirmPlayMenu
+	public void PlayLevelPack() {
+		Level.CurrentLevel = _data.Levels[_data.Progress];
+		SceneManager.LoadScene("Game", LoadSceneMode.Single);
+	}
+
+	// Opens shop menu - likely to unlock level pack
+	public void OpenShop() {
+		_shopMenu.Open();
 	}
 
 }
