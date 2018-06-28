@@ -1,7 +1,8 @@
 ﻿using UnityEngine;					// To inherit from Monobehaviour
+using UnityEngine.EventSystems;		// OnClick
 
 // Holds tile information and methods
-public class Tile : MonoBehaviour {
+public class Tile : MonoBehaviour, IPointerClickHandler {
 
 	// Returns the tile resource for instantiation
 	public static GameObject Prefab {
@@ -39,7 +40,7 @@ public class Tile : MonoBehaviour {
 	}
 
 	// Runs when mouse click on tile
-	public void OnMouseDown() {
+	public void OnPointerClick(PointerEventData data) {
 		if(Level.CurrentLevel != null) {
 			Level.CurrentLevel.FlipPairedTiles(_id);
 		}  // Maybe add some error handling if there are somehow tiles without a CurrentLevel set

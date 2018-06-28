@@ -96,9 +96,9 @@ public struct LevelPackData {
 			Levels[i] = level;
 		}
 
-		string endcodedData = jo["data"].Value<string>();
-		string decodedData = CryptoUtil.Decrypt(endcodedData);
-		JObject data = JObject.Parse(decodedData);
+		string dataStr = PlayerPrefs.GetString("progress" + jo["id"].Value<int>());
+		dataStr = CryptoUtil.Decrypt(dataStr);
+		JObject data = JObject.Parse(dataStr);
 		Unlocked = data["unlocked"].Value<bool>();
 		Progress = data["progress"].Value<int>();
 	}
