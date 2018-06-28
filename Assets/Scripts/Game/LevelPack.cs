@@ -33,16 +33,24 @@ public class LevelPack : MonoBehaviour {
 
 	/// Public methods -------------------------------------------------------------
 	// Maps data to UI objects
-	public void SetData(LevelPackData data) {
-		_data = data;
+	public void SetUIData(LevelPackData data) {
+		RefreshData(data);
 		_name.text = data.Name;
 		_locked.SetActive(!data.Unlocked);
 		if(!data.Unlocked) {
 			gameObject.GetComponent<Button>().interactable = false;
 		}
 		for(int i = 0; i < data.Progress; i++) {
-			_progress[i].color = ColorUtil.HexToColor(PROGRESS_HEX);
+			_progress[i].color = ColorUtil.HexToColor(PROGRESS_HEX);//ColorUtil.TROPHY_COLOR[data.Levels[i].Tier];
+			/*foreach(Transform child in _progress[i].transform) {
+				child.gameObject.SetActive(true);
+				child.GetComponent<Image>().color = ColorUtil.TROPHY_COLOR[data.Levels[i].Tier];
+			}*/
 		}
+	}
+
+	public void RefreshData(LevelPackData data) {
+		_data = data;
 	}
 
 	// Runs when levelpack button clicked
@@ -54,10 +62,8 @@ public class LevelPack : MonoBehaviour {
 			LevelSelectController.CurrentLevelPack = this;
 			_confirmMenu.Open();
 		}
-		else {
-
-		}
 	}
+
 	// Runs when cancel is hit or another levelpack button
 	public void UnselectLevelPack() {
 		_confirmMenu.Close();
@@ -66,7 +72,7 @@ public class LevelPack : MonoBehaviour {
 
 	// Runs when play is selected from ConfirmPlayMenu
 	public void PlayLevelPack() {
-		Level.CurrentLevel = _data.Levels[_data.Progress];
+		Level.CurrentLevel = _data.Levels[Mathf.Min(_data.Progress, 9)];
 		SceneManager.LoadScene("Game", LoadSceneMode.Single);
 	}
 
@@ -79,27 +85,31 @@ public class LevelPack : MonoBehaviour {
 
 // Contains data struct to load from data files
 public struct LevelPackData {
+	public int ID;
 	public string Name;
 	public bool Unlocked;
 	public int Progress;
 	public Level[] Levels;
 
-	public LevelPackData(JObject jo) {
-		jo = jo["level_pack"].Value<JObject>();  // Remove level_pack since would be at start of every reference
-		Name = jo["name"].Value<string>();
+	public JObject LPData;
 
-		JArray levelsja = jo["levels"].Value<JArray>();
+	public LevelPackData(JObject lpData) {
+		LPData = lpData; // Keep a copy so it's easy to update
+
+		lpData = lpData["level_pack"].Value<JObject>();  // Remove level_pack since would be at start of every reference
+		ID = lpData["id"].Value<int>();
+		Name = lpData["name"].Value<string>();
+
+		JObject progData = StaticLevelData.ReadData(ID);
+		JArray levelsja = lpData["levels"].Value<JArray>();
 		Levels = new Level[levelsja.Count];
 		for(int i = 0; i < Levels.Length; i++) {
 			Level level = new Level();
-			level.LoadFrom(levelsja[i].Value<JObject>());
+			level.LoadFrom(levelsja[i].Value<JObject>(), progData);
 			Levels[i] = level;
 		}
 
-		string dataStr = PlayerPrefs.GetString("progress" + jo["id"].Value<int>());
-		dataStr = CryptoUtil.Decrypt(dataStr);
-		JObject data = JObject.Parse(dataStr);
-		Unlocked = data["unlocked"].Value<bool>();
-		Progress = data["progress"].Value<int>();
+		Unlocked = progData["unlocked"].Value<bool>();
+		Progress = progData["progress"].Value<int>();
 	}
 }

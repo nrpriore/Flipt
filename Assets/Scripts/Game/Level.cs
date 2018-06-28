@@ -27,11 +27,11 @@ public class Level {
 	public string TileMap {
 		get{return _tileMap;}
 	}
-	// Score tier based on specified # of turns taken. [0] gold, [1] silver, [2] bronze
-	/*private int[] _tierReq;
+	// Score tier based on specified # of turns taken. [2] gold, [1] silver, [0] bronze
+	private int[] _tierReq;
 	public int[] TierReq {
 		get{return _tierReq;}
-	}*/
+	}
 
 
 	/// In-Game Level information --------------------------------------------------
@@ -56,6 +56,21 @@ public class Level {
 	public bool Modified {
 		get{return _modified;}
 	}
+	// Returns the number of moves taken so far this level
+	private int _numMoves;
+	public int NumMoves {
+		get{return _numMoves;}
+	}
+	// Returns the lowest number of moves used to beat level
+	private int _bestMoves;
+	public int BestMoves {
+		get{return _bestMoves;}
+	}
+	// Returns the trophy tier associated with _bestMoves
+	private int _tier;
+	public int Tier {
+		get{return _tier;}
+	}
 
 
 	/// Public methods -------------------------------------------------------------
@@ -63,13 +78,35 @@ public class Level {
 	public void Play() {
 		Build();
 		_modified = false;
+		_numMoves = 0;
+	}
+
+	// Resets level
+	public void Reset() {
+		// Reset tiles
+		string[] tiles = _tileMap.Split(',');
+		for(int i = 0; i < _tiles.Count; i++) {
+			bool on = int.Parse(tiles[i]) > 0;
+			_tiles[i].Set(_tiles[i].ID, on);
+		}
+
+		// Reset game vars
+		_modified = false;
+		_numMoves = 0;
+		_bestMoves = LevelSelectController.CurrentLevelPack.Data.Levels[Level.CurrentLevel.ID].BestMoves;
+		SetTier();
+		GameController.Main.UpdateMoves(_numMoves);
 	}
 	
 	// Maps JObject data to Level
-	public void LoadFrom(JObject jo) {
-		_id = jo["id"].Value<int>();
-		_width = jo["width"].Value<int>();
-		_tileMap = jo["tile_map"].Value<string>();
+	public void LoadFrom(JObject levelData, JObject progData) {
+		_id = levelData["id"].Value<int>();
+		_width = levelData["width"].Value<int>();
+		_tileMap = levelData["tile_map"].Value<string>();
+		_tierReq = new int[] {levelData["bronze"].Value<int>(), levelData["silver"].Value<int>(), levelData["gold"].Value<int>()};
+
+		_bestMoves = progData["moves"][_id].Value<int>();
+		SetTier();
 	}
 
 	// Gets vector2 position for tile with given ID based on level.Width
@@ -80,14 +117,17 @@ public class Level {
 		return new Vector2(x, y);
 	}
 
-	// Flips paired tiles for input tile id
+	// Flips paired tiles for input tile id, runs when you click tile
 	public void FlipPairedTiles(int id) {
 		_tileByID[id].FlipTile();
 		List<int> pairedIDs = _pairedTiles[id];
 		foreach(int pairedID in pairedIDs) {
 			_tileByID[pairedID].FlipTile();
 		}
+
 		_modified = true;
+		_numMoves++;
+		GameController.Main.UpdateMoves(_numMoves);
 
 		CheckWinCondition();
 	}
@@ -96,7 +136,29 @@ public class Level {
 	/// Private methods ------------------------------------------------------------
 	// Checks when condition after flipping tiles
 	private void CheckWinCondition() {
+		bool win = true;
+		foreach(Tile tile in _tiles) {
+			if(!tile.On) {
+				win = false;
+			}
+		}
 
+		if(win) {
+			GameController.Main.Win();
+		}
+	}
+
+	// Calculates what tier is associated with _bestMoves
+	private void SetTier() {
+		_tier = 0;
+		for(int i = 1; i <= _tierReq.Length; i++) {
+			if(_bestMoves <= _tierReq[i - 1]) {
+				_tier = i;
+			}
+			else {
+				break;
+			}
+		}
 	}
 
 	// Build input Level

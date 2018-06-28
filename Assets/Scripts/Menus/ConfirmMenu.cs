@@ -1,5 +1,4 @@
-﻿using UnityEngine;						// GameObject class
-using UnityEngine.UI;					// For Text class
+﻿using UnityEngine.UI;					// For Text class
 
 // Governs functionality of the ConfirmMenu gameobject
 public class ConfirmMenu : Modal {
@@ -14,7 +13,7 @@ public class ConfirmMenu : Modal {
 
 	// Runs when user confirms action
 	public void ConfirmAction() {
-		GameObject.Find("GameController").GetComponent<GameController>().ConfirmModalAction(action);
+		GameController.Main.ConfirmModalAction(action);
 	}
 
 	// Sets UI data - only takes a string

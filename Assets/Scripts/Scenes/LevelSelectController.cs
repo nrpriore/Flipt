@@ -9,7 +9,6 @@ public class LevelSelectController : MonoBehaviour {
 	private const float LP_SPACING = 20f;
 
 	private RectTransform _scrollContainer;
-	//private LevelSelectScroll _scroll;
 
 	// Runs when LevelSelect scene is loaded
 	void Start () {
@@ -37,7 +36,7 @@ public class LevelSelectController : MonoBehaviour {
 			packRT.anchoredPosition = new Vector2(0, -LP_SPACING - (i * (LP_SPACING + packRT.sizeDelta.y)));
 			scrollContSize = LP_SPACING - packRT.anchoredPosition.y + packRT.sizeDelta.y;
 
-			packRT.gameObject.GetComponent<LevelPack>().SetData(StaticLevelData.LevelPacks[i]);
+			packRT.gameObject.GetComponent<LevelPack>().SetUIData(StaticLevelData.LevelPacks[i]);
 		}
 		_scrollContainer.sizeDelta = new Vector2(_scrollContainer.sizeDelta.x, scrollContSize);
 	}
