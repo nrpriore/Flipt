@@ -42,13 +42,18 @@ public class Tile : MonoBehaviour, IPointerClickHandler {
 	// Runs when mouse click on tile
 	public void OnPointerClick(PointerEventData data) {
 		if(Level.CurrentLevel != null) {
-			Level.CurrentLevel.FlipPairedTiles(_id);
+			Level.CurrentLevel.ClickTile(_id);
 		}  // Maybe add some error handling if there are somehow tiles without a CurrentLevel set
 	}
 
-	// Flips this tile
+	// Flips this tile in-game
 	public void FlipTile() {
-		_on = !_on;
+		ToggleOn();
 		gameObject.GetComponent<SpriteRenderer>().color = (_on)? ColorON : ColorOFF;
+	}
+
+	// Updates properties when flipped
+	public void ToggleOn() {
+		_on = !_on;
 	}
 }

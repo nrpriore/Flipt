@@ -13,9 +13,14 @@ public class StartController : MonoBehaviour {
 			CryptoUtil.ResetKeys();
 		}
 		StaticLevelData.LoadLevelData();
+
+		GameController.Main = null;
+		LevelSelectController.CurrentLevelPack = null;
 		
 		Level.CurrentLevel = Level.MenuLevel(); // Create easter egg menu level
 		Level.CurrentLevel.Play();
+
+		Solve.Level(Level.CurrentLevel);
 	}
 
 

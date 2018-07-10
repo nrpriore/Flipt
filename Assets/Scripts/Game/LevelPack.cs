@@ -18,6 +18,7 @@ public class LevelPack : MonoBehaviour {
 	private Text _name;
 	private GameObject _locked;
 	private Image[] _progress;
+	private Text _trophies;
 	private Modal _confirmMenu;
 	private Modal _shopMenu;
 
@@ -26,6 +27,7 @@ public class LevelPack : MonoBehaviour {
 		_name = transform.Find("Name").GetComponent<Text>();
 		_locked = transform.Find("Locked").gameObject;
 		_progress = transform.Find("Progress").GetComponentsInChildren<Image>();
+		_trophies = transform.Find("Trophies").Find("Count").GetComponent<Text>();
 		_confirmMenu = transform.Find("Menus").Find("ConfirmPlayMenu").GetComponent<ConfirmPlayMenu>();
 		
 		_shopMenu = GameObject.Find("ShopMenu").GetComponent<ShopMenu>();
@@ -40,13 +42,19 @@ public class LevelPack : MonoBehaviour {
 		if(!data.Unlocked) {
 			gameObject.GetComponent<Button>().interactable = false;
 		}
+
+		int total = 0;
 		for(int i = 0; i < data.Progress; i++) {
 			_progress[i].color = ColorUtil.HexToColor(PROGRESS_HEX);//ColorUtil.TROPHY_COLOR[data.Levels[i].Tier];
-			/*foreach(Transform child in _progress[i].transform) {
-				child.gameObject.SetActive(true);
-				child.GetComponent<Image>().color = ColorUtil.TROPHY_COLOR[data.Levels[i].Tier];
-			}*/
+			foreach(Transform child in _progress[i].transform) {
+				if(!child.gameObject.activeSelf) {
+					child.gameObject.SetActive(true);
+					child.GetComponent<Image>().color = ColorUtil.TROPHY_COLOR[data.Levels[i].Tier];
+					total += data.Levels[i].Tier;
+				}
+			}
 		}
+		_trophies.text = total + " / 30";
 	}
 
 	public void RefreshData(LevelPackData data) {

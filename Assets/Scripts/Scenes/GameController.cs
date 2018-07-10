@@ -27,6 +27,8 @@ public class GameController : MonoBehaviour {
 		ConfigBestScore();
 		SetButtons();
 		Level.CurrentLevel.Play();
+
+		Solve.Level(Level.CurrentLevel);
 	}	
 
 
@@ -146,7 +148,7 @@ public class GameController : MonoBehaviour {
 			_bestScore.transform.Find("Text").GetComponent<Text>().text = Level.CurrentLevel.BestMoves.ToString();
 
 			Image trophy = _bestScore.transform.Find("Trophy").GetComponent<Image>();
-			trophy.sprite = Resources.Load<Sprite>("Sprites/Trophy/Trophy" + (Level.CurrentLevel.Tier));
+			//trophy.sprite = Resources.Load<Sprite>("Sprites/Trophy/Trophy" + (Level.CurrentLevel.Tier));
 			trophy.color = ColorUtil.TROPHY_COLOR[Level.CurrentLevel.Tier];
 		}
 		else {

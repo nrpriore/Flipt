@@ -83,12 +83,7 @@ public class Level {
 
 	// Resets level
 	public void Reset() {
-		// Reset tiles
-		string[] tiles = _tileMap.Split(',');
-		for(int i = 0; i < _tiles.Count; i++) {
-			bool on = int.Parse(tiles[i]) > 0;
-			_tiles[i].Set(_tiles[i].ID, on);
-		}
+		ResetTiles();
 
 		// Reset game vars
 		_modified = false;
@@ -97,13 +92,21 @@ public class Level {
 		SetTier();
 		GameController.Main.UpdateMoves(_numMoves);
 	}
+	// Resets tiles
+	public void ResetTiles() {
+		string[] tiles = _tileMap.Split(',');
+		for(int i = 0; i < _tiles.Count; i++) {
+			bool on = int.Parse(tiles[i]) > 0;
+			_tiles[i].Set(_tiles[i].ID, on);
+		}
+	}
 	
 	// Maps JObject data to Level
 	public void LoadFrom(JObject levelData, JObject progData) {
 		_id = levelData["id"].Value<int>();
 		_width = levelData["width"].Value<int>();
 		_tileMap = levelData["tile_map"].Value<string>();
-		_tierReq = new int[] {levelData["bronze"].Value<int>(), levelData["silver"].Value<int>(), levelData["gold"].Value<int>()};
+		_tierReq = new int[] {levelData["silver"].Value<int>(), levelData["gold"].Value<int>()};
 
 		_bestMoves = progData["moves"][_id].Value<int>();
 		SetTier();
@@ -117,19 +120,25 @@ public class Level {
 		return new Vector2(x, y);
 	}
 
-	// Flips paired tiles for input tile id, runs when you click tile
-	public void FlipPairedTiles(int id) {
-		_tileByID[id].FlipTile();
-		List<int> pairedIDs = _pairedTiles[id];
-		foreach(int pairedID in pairedIDs) {
+	// Runs on tile click, called from Tile
+	public void ClickTile(int id) {
+		foreach(int pairedID in _pairedTiles[id]) {
 			_tileByID[pairedID].FlipTile();
 		}
 
 		_modified = true;
 		_numMoves++;
-		GameController.Main.UpdateMoves(_numMoves);
+		if(GameController.Main != null) {
+			GameController.Main.UpdateMoves(_numMoves);
+			CheckWinCondition();
+		}
+	}
 
-		CheckWinCondition();
+	// Flips paired tiles for input tile id, runs during Solve algorithm
+	public void FlipPairedTiles(int id) {
+		foreach(int pairedID in _pairedTiles[id]) {
+			_tileByID[pairedID].ToggleOn();
+		}
 	}
 
 
@@ -150,10 +159,14 @@ public class Level {
 
 	// Calculates what tier is associated with _bestMoves
 	private void SetTier() {
-		_tier = 0;
+		if(_bestMoves == 0) {
+			_tier = 0;
+			return;
+		}
+		_tier = 1;
 		for(int i = 1; i <= _tierReq.Length; i++) {
 			if(_bestMoves <= _tierReq[i - 1]) {
-				_tier = i;
+				_tier++;
 			}
 			else {
 				break;
@@ -189,6 +202,7 @@ public class Level {
 		_pairedTiles = new Dictionary<int, List<int>>();
 		foreach(Tile tile in _tiles) {
 			List<int> pairedTiles = new List<int>();
+			pairedTiles.Add(tile.ID);
 			// Check up
 			int i = 1;
 			while(_tileByID.ContainsKey(tile.ID + (i * _width))) {

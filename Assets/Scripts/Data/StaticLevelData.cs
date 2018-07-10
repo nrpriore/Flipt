@@ -112,7 +112,7 @@ public static class StaticLevelData {
 	private static string DefLevelPackData(string name) {
 		switch(name) {
 			case "0":
-				return "{\"id\":0,\"unlocked\":true,\"progress\":10,\"moves\":[6,6,14,8,8,26,6,14,10,6]}";
+				return "{\"id\":0,\"unlocked\":true,\"progress\":10,\"moves\":[6,6,6,6,6,6,6,6,6,6]}";
 			case "1":
 				return "{\"id\":1,\"unlocked\":true,\"progress\":10,\"moves\":[8,6,8,16,26,6,14,8,8,6]}";
 			case "2":
