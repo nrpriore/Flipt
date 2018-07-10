@@ -20,7 +20,7 @@ public class StartController : MonoBehaviour {
 		Level.CurrentLevel = Level.MenuLevel(); // Create easter egg menu level
 		Level.CurrentLevel.Play();
 
-		Solve.Level(Level.CurrentLevel);
+		//Solve.Level(Level.CurrentLevel);
 	}
 
 

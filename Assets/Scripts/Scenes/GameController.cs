@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour {
 		SetButtons();
 		Level.CurrentLevel.Play();
 
-		Solve.Level(Level.CurrentLevel);
+		//Solve.Level(Level.CurrentLevel);
 	}	
 
 
