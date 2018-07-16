@@ -5,61 +5,116 @@ using System.Collections.Generic;  // List
 public static class Solve {
 
 	private static List<List<int>> _movesets;
+	private static List<bool> _bool0;
+	private static List<bool> _bool1;
+	private static List<int> _ids;
+
+	private static float _freqOffset;
+	private static System.Diagnostics.Stopwatch _time = new System.Diagnostics.Stopwatch();
+	private static float _prevTime = 0;
+
+	/*private static System.Diagnostics.Stopwatch movesettime = new System.Diagnostics.Stopwatch();
+	private static float _avgTime;*/
+	/*private static System.Diagnostics.Stopwatch fliptime = new System.Diagnostics.Stopwatch();
+	private static float _avgFlipTime;*/
+	/*private static System.Diagnostics.Stopwatch checktime = new System.Diagnostics.Stopwatch();
+	private static float _avgCheckTime;*/
+
+	private static int _tileID;
+	private static int _start;
+	private static List<int> _next;
+	private static bool _win;
 
 	// Solves given Level
 	public static void Level(Level level) {
-		System.Diagnostics.Stopwatch time = new System.Diagnostics.Stopwatch();
-		time.Start();
+		_freqOffset = (float)System.Diagnostics.Stopwatch.Frequency / 1000000f;
+		_time.Restart();
+		_prevTime = 0;
 
+		_ids = new List<int>();
 		List<Tile> uniqueTiles = new List<Tile>(level.Tiles);  // Remove tiles with identical pairs
-		for(int i = 0; i < level.Tiles.Count-1; i++) {
-			for(int j = i+1; j < level.Tiles.Count; j++) {
-				if(UnorderedEqual(level.PairedTiles[level.Tiles[i].ID], level.PairedTiles[level.Tiles[j].ID])) {
-					uniqueTiles.Remove(level.Tiles[j]);
+		for(int i = 0; i < uniqueTiles.Count-1; i++) {
+			for(int j = i+1; j < uniqueTiles.Count; j++) {
+				if(UnorderedEqual(level.PairedTiles[uniqueTiles[i].ID], level.PairedTiles[uniqueTiles[j].ID])) {
+					uniqueTiles.Remove(uniqueTiles[j]);
 				}
 			}
+			_ids.Add(uniqueTiles[i].ID);
 		}
+		_ids.Add(uniqueTiles[uniqueTiles.Count-1].ID);
+		//LogTime("Remove redundant tiles");
+
+		// Set bool array to reset tiles quicker
+		_bool0 = new List<bool>();
+		//string[] tiles = level.TileMap.Split(',');
+		for(int i = 0; i < level.Tiles.Count; i++) {
+			//bool on = int.Parse(tiles[i]) > 0;
+			_bool0.Add(level.Tiles[i].On);
+		}
+		_bool1 = new List<bool>(_bool0);
+		//LogTime("Made bool and pos array");
+
 		
 		// Loop through combinations of given numMoves, starting low
 		for(int numMoves = 1; numMoves <= uniqueTiles.Count; numMoves++) {
 			_movesets = new List<List<int>>();
 			BuildMovesets(new List<int>(), numMoves, uniqueTiles.Count);  // Build movesets
+			//LogTime("Build moveset for " + numMoves + " moves");
 
 			// Check moveset!
-			level.ResetTiles();
+			//_avgTime = 0f;
+			//_avgFlipTime = 0f;
+			//_avgCheckTime = 0f;
 			foreach(List<int> moveset in _movesets) {
-				foreach(int move in moveset) {  // Execute moveset
-					int tileID = uniqueTiles[move].ID;
-					level.FlipPairedTiles(tileID);
-				}
+				//movesettime.Restart();
 
-				bool win = true;  // Check win condition
-				foreach(Tile tile in level.Tiles) {
-					if(!tile.On) {
-						win = false;
+				//fliptime.Restart();
+				foreach(int move in moveset) {  // Execute moveset
+					foreach(int pair in level.PairedTiles[_ids[move]]) {
+						_bool1[pair] ^= true;
+					}
+				}
+				//_avgFlipTime += fliptime.ElapsedTicks;
+				//fliptime.Stop();
+
+				//checktime.Restart();
+				_win = true;
+				for(int i = 0; i < _bool1.Count; i++) {
+					if(!_bool1[i]) {
+						_win = false;
+						_bool1 = new List<bool>(_bool0);
 						break;
 					}
 				}
+				//_avgCheckTime += checktime.ElapsedTicks;
+				//checktime.Stop();
 
-				if(win) {  // If win
+				if(_win) {  // If win
+					LogTime("Found solution");
+					_time.Reset();
+					_prevTime = 0;
+
 					string solution = "";
 					foreach(int move in moveset) {
 						solution = solution + uniqueTiles[move].ID + ",";
 					}
 					solution = solution.Substring(0, solution.Length - 1);
 					Debug.Log("Solved level by pressing " + solution);
-					Debug.Log("Level can be solved in " + numMoves + " moves");
-
-					time.Stop();
-					Debug.Log(time.ElapsedMilliseconds);
+					//Debug.Log("Level can be solved in " + numMoves + " moves");
 
 					return;
 				}
 
-				level.ResetTiles();  // Reset if failed
+				//_avgTime += movesettime.ElapsedTicks;
 			}
+			//_avgTime /= (_freqOffset * _movesets.Count);
+			//_avgFlipTime /= (_freqOffset * _movesets.Count);
+			//_avgCheckTime /= (_freqOffset * _movesets.Count);
+			//Debug.Log("Average time per solution for " + numMoves + "moves: " + _avgTime + "us");
+			//Debug.Log("Average time per fliptiles for " + numMoves + "moves: " + _avgFlipTime + "us");
+			//Debug.Log("Average time per checksol for " + numMoves + "moves: " + _avgCheckTime + "us");
 
-			Debug.Log("No solution in " + numMoves + " moves");			
+			//LogTime("Checked solutions for " + numMoves + " moves");
 		}
 	}
 
@@ -69,25 +124,12 @@ public static class Solve {
 			_movesets.Add(moveset);
 			return;
 		}
-		int start = (moveset.Count > 0)? moveset[moveset.Count-1]+1 : 0;
-		for(int i = start; i < numTiles; i++) {
-			List<int> next = new List<int>(moveset);
-			next.Add(i);
-			if(numTiles-1 - next[next.Count-1] < (numMoves - next.Count)) {
-				return;
-			}
-			BuildMovesets(next, numMoves, numTiles);
+		_start = (moveset.Count > 0)? moveset[moveset.Count-1]+1 : 0;
+		for(int i = _start; i <= numTiles + moveset.Count - numMoves; i++) {
+			_next = new List<int>(moveset);
+			_next.Add(i);
+			BuildMovesets(_next, numMoves, numTiles);
 		}
-	}
-	
-	// Logs the values in a list
-	private static void Log(List<int> list) {
-		string debug = "";
-		foreach(int move in list) {
-			debug = debug + move + ",";
-		}
-		debug = debug.Substring(0, debug.Length - 1);
-		Debug.Log(debug);
 	}
 
 	// Determines unordered equality between integer lists
@@ -131,5 +173,44 @@ public static class Solve {
 
         return true;
     }
+
+	/// Debug ----------------------------------------------------------------------
+	// Logs the values in a list
+	private static void LogList(List<int> list) {
+		string debug = "";
+		foreach(int move in list) {
+			debug = debug + move + ",";
+		}
+		debug = debug.Substring(0, debug.Length - 1);
+		Debug.Log(debug);
+	}
+
+	// Log the elapsed time taken
+	private static void LogTime(string caption) {
+		float newTime = (float)_time.ElapsedTicks - _prevTime;
+		_prevTime = (float)_time.ElapsedTicks;
+
+		newTime /= _freqOffset; // Convert to microseconds
+		string inctime = "";
+		if(newTime > 1000f) {
+			newTime /= 1000f;
+			inctime = newTime + "ms";
+		}
+		else {
+			inctime = newTime + "us";
+		}
+
+		float total = _prevTime / _freqOffset;
+		string tottime = "";
+		if(total > 1000f) {
+			total /= 1000f;
+			tottime = total + "ms";
+		}
+		else {
+			tottime = total + "us";
+		}
+
+		Debug.Log(caption + ": " + inctime + " - total: " + tottime);
+	}
 
 }

@@ -41,9 +41,9 @@ public class Level {
 		get{return _tiles;}
 	}
 	// Returns tile with given ID
-	private Dictionary<int, Tile> _tileByID;
-	public Dictionary<int, Tile> TileByID {
-		get{return _tileByID;}
+	private Dictionary<int, Tile> _tileByPosID;
+	public Dictionary<int, Tile> TileByPosID {
+		get{return _tileByPosID;}
 	}
 	// Returns list of IDs paired with given tile ID
 	private Dictionary<int, List<int>> _pairedTiles;
@@ -97,7 +97,7 @@ public class Level {
 		string[] tiles = _tileMap.Split(',');
 		for(int i = 0; i < _tiles.Count; i++) {
 			bool on = int.Parse(tiles[i]) > 0;
-			_tiles[i].Set(_tiles[i].ID, on);
+			_tiles[i].Set(_tiles[i].ID, on, _tiles[i].PosID);
 		}
 	}
 	
@@ -123,7 +123,7 @@ public class Level {
 	// Runs on tile click, called from Tile
 	public void ClickTile(int id) {
 		foreach(int pairedID in _pairedTiles[id]) {
-			_tileByID[pairedID].FlipTile();
+			_tiles[pairedID].FlipTile();
 		}
 
 		_modified = true;
@@ -133,14 +133,6 @@ public class Level {
 			CheckWinCondition();
 		}
 	}
-
-	// Flips paired tiles for input tile id, runs during Solve algorithm
-	public void FlipPairedTiles(int id) {
-		foreach(int pairedID in _pairedTiles[id]) {
-			_tileByID[pairedID].ToggleOn();
-		}
-	}
-
 
 	/// Private methods ------------------------------------------------------------
 	// Checks when condition after flipping tiles
@@ -181,21 +173,21 @@ public class Level {
 
 		// Create tiles
 		_tiles = new List<Tile>();
-		_tileByID = new Dictionary<int, Tile>();
+		_tileByPosID = new Dictionary<int, Tile>();
 		Transform tileContainer = new GameObject().transform;
 		tileContainer.name = "Tiles";
 		string[] tiles = _tileMap.Split(',');
 		foreach(string curTile in tiles) {
-			int id = int.Parse(curTile);
-			bool on = id > 0;
-			id = Mathf.Abs(id) - 1;
+			int posID = int.Parse(curTile);
+			bool on = posID > 0;
+			posID = Mathf.Abs(posID) - 1;
 			Tile tile = GameObject.Instantiate<GameObject>(Tile.Prefab, tileContainer).GetComponent<Tile>();
 			tile.name = tile.name.Substring(0, tile.name.Length - 7);
-			tile.transform.localPosition = GetTilePosition(id);
-			tile.Set(id, on);
+			tile.transform.localPosition = GetTilePosition(posID);
+			tile.Set(_tiles.Count, on, posID);
 
 			_tiles.Add(tile);
-			_tileByID[id] = tile;
+			_tileByPosID[posID] = tile;
 		}
 
 		// Pair tiles
@@ -205,26 +197,26 @@ public class Level {
 			pairedTiles.Add(tile.ID);
 			// Check up
 			int i = 1;
-			while(_tileByID.ContainsKey(tile.ID + (i * _width))) {
-				pairedTiles.Add(tile.ID + (i * _width));
+			while(_tileByPosID.ContainsKey(tile.PosID + (i * _width))) {
+				pairedTiles.Add(_tileByPosID[tile.PosID + (i * _width)].ID);
 				i++;
 			}
 			// Check left
 			i = 1;
-			while(_tileByID.ContainsKey(tile.ID - i) && (tile.ID - i) / _width == tile.ID / _width) {
-				pairedTiles.Add(tile.ID - i);
+			while(_tileByPosID.ContainsKey(tile.PosID - i) && (tile.PosID - i) / _width == tile.PosID / _width) {
+				pairedTiles.Add(_tileByPosID[tile.PosID - i].ID);
 				i++;
 			}
 			// Check down
 			i = 1;
-			while(_tileByID.ContainsKey(tile.ID - (i * _width))) {
-				pairedTiles.Add(tile.ID - (i * _width));
+			while(_tileByPosID.ContainsKey(tile.PosID - (i * _width))) {
+				pairedTiles.Add(_tileByPosID[tile.PosID - (i * _width)].ID);
 				i++;
 			}
 			// Check right
 			i = 1;
-			while(_tileByID.ContainsKey(tile.ID + i) && (tile.ID + i) / _width == tile.ID / _width) {
-				pairedTiles.Add(tile.ID + i);
+			while(_tileByPosID.ContainsKey(tile.PosID + i) && (tile.PosID + i) / _width == tile.PosID / _width) {
+				pairedTiles.Add(_tileByPosID[tile.PosID + i].ID);
 				i++;
 			}
 			// Set dictionary

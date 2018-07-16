@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour {
 		SetButtons();
 		Level.CurrentLevel.Play();
 
-		//Solve.Level(Level.CurrentLevel);
+		Solve.Level(Level.CurrentLevel);
 	}	
 
 
@@ -115,6 +115,11 @@ public class GameController : MonoBehaviour {
 				_confirmMenu.Close();
 				break;
 		}
+	}
+
+	// Runs when hint button is pressed
+	public void PressHint() {
+		Solve.Level(Level.CurrentLevel);
 	}
 
 

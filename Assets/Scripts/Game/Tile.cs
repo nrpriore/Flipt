@@ -29,13 +29,19 @@ public class Tile : MonoBehaviour, IPointerClickHandler {
 	public bool On {
 		get{return _on;}
 	}
+	// Pos ID of the token in the current level, PosID = 1 starts bottom left and counts left then up
+	private int _posID;
+	public int PosID {
+		get{return _posID;}
+	}
 
 
 	/// Public methods -------------------------------------------------------------
 	// Sets the tile variables
-	public void Set(int id, bool on) {
+	public void Set(int id, bool on, int posID) {
 		_id = id;
 		_on = on;
+		_posID = posID;
 		gameObject.GetComponent<SpriteRenderer>().color = (_on)? ColorON : ColorOFF;
 	}
 
@@ -48,12 +54,8 @@ public class Tile : MonoBehaviour, IPointerClickHandler {
 
 	// Flips this tile in-game
 	public void FlipTile() {
-		ToggleOn();
+		_on = !_on;
 		gameObject.GetComponent<SpriteRenderer>().color = (_on)? ColorON : ColorOFF;
 	}
 
-	// Updates properties when flipped
-	public void ToggleOn() {
-		_on = !_on;
-	}
 }
