@@ -5,8 +5,8 @@ using System.Collections.Generic;  // List
 public static class Solve {
 
 	private static List<List<int>> _movesets;
-	private static List<bool> _bool0;
-	private static List<bool> _bool1;
+	private static List<bool> _bool0;  // Starting 'on' config. reset to this after check
+	private static List<bool> _bool1;  // Current config in algo
 	private static List<int> _ids;
 
 	private static float _freqOffset;
@@ -46,9 +46,7 @@ public static class Solve {
 
 		// Set bool array to reset tiles quicker
 		_bool0 = new List<bool>();
-		//string[] tiles = level.TileMap.Split(',');
 		for(int i = 0; i < level.Tiles.Count; i++) {
-			//bool on = int.Parse(tiles[i]) > 0;
 			_bool0.Add(level.Tiles[i].On);
 		}
 		_bool1 = new List<bool>(_bool0);
