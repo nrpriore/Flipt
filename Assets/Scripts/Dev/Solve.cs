@@ -1,5 +1,7 @@
-﻿using UnityEngine;	// Debug.Log
-using System.Collections.Generic;  // List
+﻿//using UnityEngine;				// Debug.Log
+using System;						// Random
+using System.Threading;
+using System.Collections.Generic;	// List
 
 // Class used during development to solve levels
 public static class Solve {
@@ -9,27 +11,35 @@ public static class Solve {
 	private static List<bool> _bool1;  // Current config in algo
 	private static List<int> _ids;
 
-	private static float _freqOffset;
-	private static System.Diagnostics.Stopwatch _time = new System.Diagnostics.Stopwatch();
-	private static float _prevTime = 0;
-
-	/*private static System.Diagnostics.Stopwatch movesettime = new System.Diagnostics.Stopwatch();
-	private static float _avgTime;*/
-	/*private static System.Diagnostics.Stopwatch fliptime = new System.Diagnostics.Stopwatch();
-	private static float _avgFlipTime;*/
-	/*private static System.Diagnostics.Stopwatch checktime = new System.Diagnostics.Stopwatch();
-	private static float _avgCheckTime;*/
-
 	private static int _tileID;
 	private static int _start;
 	private static List<int> _next;
 	private static bool _win;
 
+	private static int _hintID;
+	public static int HintID {
+		get{return _hintID;}
+	}
+	private static Random rnd = new Random();
+
+	public static IEnumerator<int> GetNextHint(Level level) {
+		_hintID = -1;
+		Thread solve_thread = new Thread( () => {SolveLevel(level);} );
+		solve_thread.IsBackground = true;
+		solve_thread.Start();
+
+		while(_hintID < 0) {
+			yield return -1;
+		}
+
+		//Debug.Log("Next hint is " + _hintID);
+	}
+
 	// Solves given Level
-	public static void Level(Level level) {
-		_freqOffset = (float)System.Diagnostics.Stopwatch.Frequency / 1000000f;
+	private static void SolveLevel(Level level) {
+		/*_freqOffset = (float)System.Diagnostics.Stopwatch.Frequency / 1000000f;
 		_time.Restart();
-		_prevTime = 0;
+		_prevTime = 0;*/
 
 		_ids = new List<int>();
 		List<Tile> uniqueTiles = new List<Tile>(level.Tiles);  // Remove tiles with identical pairs
@@ -88,18 +98,19 @@ public static class Solve {
 				//checktime.Stop();
 
 				if(_win) {  // If win
-					LogTime("Found solution");
+					/*LogTime("Found solution");
 					_time.Reset();
-					_prevTime = 0;
+					_prevTime = 0;*/
 
-					string solution = "";
+					/*string solution = "";
 					foreach(int move in moveset) {
 						solution = solution + uniqueTiles[move].ID + ",";
 					}
 					solution = solution.Substring(0, solution.Length - 1);
-					Debug.Log("Solved level by pressing " + solution);
+					Debug.Log("Solved level by pressing " + solution);*/
 					//Debug.Log("Level can be solved in " + numMoves + " moves");
 
+					_hintID = uniqueTiles[moveset[rnd.Next(moveset.Count)]].ID;
 					return;
 				}
 
@@ -173,8 +184,21 @@ public static class Solve {
     }
 
 	/// Debug ----------------------------------------------------------------------
+
+	/*private static float _freqOffset;
+	private static System.Diagnostics.Stopwatch _time = new System.Diagnostics.Stopwatch();
+	private static float _prevTime = 0;*/
+
+	/*private static System.Diagnostics.Stopwatch movesettime = new System.Diagnostics.Stopwatch();
+	private static float _avgTime;*/
+	/*private static System.Diagnostics.Stopwatch fliptime = new System.Diagnostics.Stopwatch();
+	private static float _avgFlipTime;*/
+	/*private static System.Diagnostics.Stopwatch checktime = new System.Diagnostics.Stopwatch();
+	private static float _avgCheckTime;*/
+
+
 	// Logs the values in a list
-	private static void LogList(List<int> list) {
+	/*private static void LogList(List<int> list) {
 		string debug = "";
 		foreach(int move in list) {
 			debug = debug + move + ",";
@@ -209,6 +233,6 @@ public static class Solve {
 		}
 
 		Debug.Log(caption + ": " + inctime + " - total: " + tottime);
-	}
+	}*/
 
 }

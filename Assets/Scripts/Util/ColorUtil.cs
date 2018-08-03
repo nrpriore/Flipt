@@ -4,6 +4,8 @@
 public static class ColorUtil {
 
 	public static readonly Color[] TROPHY_COLOR = {HexToColor("FFFFFF"), HexToColor("CD7F32"), HexToColor("BCC6CC"), HexToColor("FFD700")};
+	public static readonly Color[] TILE_COLOR = {HexToColor("1F325B"), HexToColor("FFFFFF")};
+	public static readonly Color HINT_COLOR = HexToColor("FDFF5B");
 
 	// Used to covert a hex string into a Unity Color
 	public static Color HexToColor(string hex) {

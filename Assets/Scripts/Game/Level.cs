@@ -125,18 +125,26 @@ public class Level {
 		foreach(int pairedID in _pairedTiles[id]) {
 			_tiles[pairedID].FlipTile();
 		}
+		if(Solve.HintID >= 0 && id != Solve.HintID) {
+			_tiles[Solve.HintID].UpdateColor();
+		}
 
 		_modified = true;
 		_numMoves++;
 		if(GameController.Main != null) {
 			GameController.Main.UpdateMoves(_numMoves);
-			CheckWinCondition();
+			PostClickActions();
 		}
 	}
 
+	// Highlights hint tile
+	public void HighlightHint(int tileID) {
+		_tiles[tileID].HighlightHint();
+	}
+
 	/// Private methods ------------------------------------------------------------
-	// Checks when condition after flipping tiles
-	private void CheckWinCondition() {
+	// Checks when condition after flipping tiles and starts hint solver if not
+	private void PostClickActions() {
 		bool win = true;
 		foreach(Tile tile in _tiles) {
 			if(!tile.On) {
@@ -146,6 +154,9 @@ public class Level {
 
 		if(win) {
 			GameController.Main.Win();
+		}
+		else {
+			GameController.Main.GetNextHint();
 		}
 	}
 

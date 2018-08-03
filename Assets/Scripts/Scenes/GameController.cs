@@ -1,6 +1,7 @@
 ﻿using UnityEngine;					// To inherit from Monobehaviour
 using UnityEngine.UI;				// To set UI properties on scene
 using UnityEngine.SceneManagement;	// To change scenes
+using System.Collections;
 
 // Main class for Game scene
 public class GameController : MonoBehaviour {
@@ -8,9 +9,12 @@ public class GameController : MonoBehaviour {
 	public static GameController Main;
 
 	private Modal _confirmMenu;
+	private Modal _confirmHintMenu;
 	private Modal _winMenu;
 	private Text _currScore;
 	private GameObject _bestScore;
+
+	private IEnumerator _solverCoroutine;
 
 	// Runs when Game scene is loaded
 	void Start () {
@@ -20,6 +24,7 @@ public class GameController : MonoBehaviour {
 		GameObject.Find("CurrentLevel").GetComponent<Text>().text = "Level:  " + (Level.CurrentLevel.ID + 1) + " / 10";
 
 		_confirmMenu = GameObject.Find("ConfirmMenu").GetComponent<ConfirmMenu>();
+		_confirmHintMenu = GameObject.Find("ConfirmHintMenu").GetComponent<ConfirmHintMenu>();
 		_winMenu = GameObject.Find("WinMenu").GetComponent<WinMenu>();
 		_currScore = GameObject.Find("CurrScore").transform.Find("Text").GetComponent<Text>();
 		_bestScore = GameObject.Find("BestScore");
@@ -28,7 +33,7 @@ public class GameController : MonoBehaviour {
 		SetButtons();
 		Level.CurrentLevel.Play();
 
-		Solve.Level(Level.CurrentLevel);
+		GetNextHint();
 	}	
 
 
@@ -117,13 +122,38 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	// Runs when a tile is clicked & the game isn't won yet
+	public void GetNextHint() {
+		if(_solverCoroutine != null) {
+			StopCoroutine(_solverCoroutine);
+		}
+
+		_solverCoroutine = Solve.GetNextHint(Level.CurrentLevel);
+		StartCoroutine(_solverCoroutine);
+	}
 	// Runs when hint button is pressed
 	public void PressHint() {
-		Solve.Level(Level.CurrentLevel);
+		OpenConfirmHintMenu();
+	}
+	public void ConfirmUseHint() {
+		if(Solve.HintID >= 0) {
+			_confirmHintMenu.Close();
+			Level.CurrentLevel.HighlightHint(Solve.HintID);
+		}
+		else {
+			//
+			// Add waiting animation
+			//
+			Debug.Log("Still solving hint");
+		}
 	}
 
-
 	/// Private methods ------------------------------------------------------------
+	// Opens confirmation for using hint
+	private void OpenConfirmHintMenu() {
+		_confirmHintMenu.Open();
+	}
+
 	// Opens confirmation window for _intendedAction
 	private void OpenConfirmMenu(string action) {
 		_confirmMenu.SetData(action);

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;					// To inherit from Monobehaviour
+using System;						// Convert
 using UnityEngine.EventSystems;		// OnClick
 
 // Holds tile information and methods
@@ -8,15 +9,6 @@ public class Tile : MonoBehaviour, IPointerClickHandler {
 	public static GameObject Prefab {
 		get {return Resources.Load<GameObject>("Prefabs/Game/Tile");}
 	}
-	// Returns Color to paint 'on' tiles
-	public static Color ColorON {
-		get {return ColorUtil.HexToColor("FFFFFF");}
-	}
-	// Returns Color to paint 'off' tiles
-	public static Color ColorOFF {
-		get {return ColorUtil.HexToColor("1F325B");}
-	}
-
 
 	/// Tile information -----------------------------------------------------------
 	// ID of the token in the current level, ID = 1 starts bottom left and counts left then up
@@ -42,20 +34,29 @@ public class Tile : MonoBehaviour, IPointerClickHandler {
 		_id = id;
 		_on = on;
 		_posID = posID;
-		gameObject.GetComponent<SpriteRenderer>().color = (_on)? ColorON : ColorOFF;
+		UpdateColor();
 	}
 
 	// Runs when mouse click on tile
 	public void OnPointerClick(PointerEventData data) {
 		if(Level.CurrentLevel != null) {
 			Level.CurrentLevel.ClickTile(_id);
-		}  // Maybe add some error handling if there are somehow tiles without a CurrentLevel set
+		}
 	}
 
 	// Flips this tile in-game
 	public void FlipTile() {
 		_on = !_on;
-		gameObject.GetComponent<SpriteRenderer>().color = (_on)? ColorON : ColorOFF;
+		UpdateColor();
+	}
+
+	public void UpdateColor() {
+		gameObject.GetComponent<SpriteRenderer>().color = ColorUtil.TILE_COLOR[Convert.ToInt32(_on)];
+	}
+	
+	// Highlights tile to show hint
+	public void HighlightHint() {
+		gameObject.GetComponent<SpriteRenderer>().color = ColorUtil.HINT_COLOR;
 	}
 
 }
