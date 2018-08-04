@@ -32,7 +32,7 @@ public static class Solve {
 			yield return -1;
 		}
 
-		//Debug.Log("Next hint is " + _hintID);
+		//UnityEngine.Debug.Log("Next hint is " + _hintID);
 	}
 
 	// Solves given Level
